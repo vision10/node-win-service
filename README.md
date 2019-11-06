@@ -1,5 +1,3 @@
-# win-service
-
 ![NPM version](https://badge.fury.io/js/win-service.png)
 
 Wrapper for [WinSW](https://github.com/kohsuke/winsw), event logging, Windows service manager.
