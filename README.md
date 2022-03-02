@@ -1,7 +1,8 @@
-![NPM version](https://badge.fury.io/js/win-service.png)
+[![npm version](https://badge.fury.io/js/win-sv.svg)](https://badge.fury.io/js/win-sv)
 
 Wrapper for [WinSW](https://github.com/kohsuke/winsw), event logging, Windows service manager.
-
+- Temporarely using 2.11.0 until a more stable version is released
+- current verrsion: WinSW v3.0.0-alpha.10
 ## Features
 
 - **OS Service**: Run scripts (not necessarily Node.js) as native Windows services.
@@ -13,11 +14,11 @@ Wrapper for [WinSW](https://github.com/kohsuke/winsw), event logging, Windows se
 
 ## Installation
 
-    npm install -g win-service
+    npm install -g win-sv
   
   or  
 
-    npm install win-service
+    npm install win-sv
 
 ## Usage
 
@@ -26,23 +27,26 @@ Wrapper for [WinSW](https://github.com/kohsuke/winsw), event logging, Windows se
 Minimal required options (`name`, `script`): 
 
 ```js
-var { Service } = require('win-service');
+var { Service } = require('win-sv');
 
 var svc = new Service({
-  name: 'Hello World',
+  id: 'HelloWorld', // service name
   script: 'C:\\path\\to\\helloworld.js',
+  
+  // optional
+  name: 'my service' // display name
   description: 'Server powered by node.js.',
 });
 ```
 A few more options
 - `winswDir`: directory name for winsw instance
-- `winswPath`: path where to place the winsw.exe instance, 
+- `winswDest`: path where to place the winsw.exe instance, 
   - defaults to `script` path
 
 ```js
-  winswDir: 'service',
-  winswPath: 'C:/different/path',
-  // result: creates a folder named service in C:/different/path/
+  winswDir: 'service', // default 
+  winswDest: 'C:/different/path',
+  // result: creates a folder named 'service' in C:/different/path/
 
   nodeOptions: ['--harmony'],
   // or
@@ -86,11 +90,13 @@ var result = await svc.stop() => Promise;
 var result = await svc.restart() => Promise;
 var result = await svc.selfRestart() => Promise;
 var result = await svc.install() => Promise;
+var result = await svc.refresh() => Promise;
+var result = await svc.customize() => Promise;
 // auto stops if necesssary
 var result = await svc.uninstall(skipFileDelete) => Promise;
 ```
 
-> Note: `uninstall` only removes the OS service and process specific files (file removal can be skipped).
+> Note: `uninstall` only removes the OS service and process specific files not the application (file removal can be skipped).
 
 
 **Events**
@@ -136,14 +142,14 @@ log.registerEventSource() => Promise
 
 **start, stop, restart**
 
-- net start, net stop  
+- using net start, net stop
 
 ```js
-var win = require('win-service');
+var srv = require('win-sv');
 
-win.process.start(serviceName) => Promise;
-win.process.stop(serviceName) => Promise;
-win.Process.restart(serviceName) => Promise;
+srv.process.start(serviceName) => Promise;
+srv.process.stop(serviceName) => Promise;
+srv.Process.restart(serviceName) => Promise;
 ```
 
 **list**
@@ -152,11 +158,9 @@ Displays a list of currently running processes.
 - cmd -> tasklist 
 
 ```js
-var { Process } = require('win-service');
-// or
-var { process } = require('win-service');
+var service = require('win-sv');
 
-Process.list([filter][,verbose]) => Promise;
+service.process.list([filter][,verbose]) => Promise;
 ```
 
 Output is specific to the version of the OS.  
@@ -184,11 +188,11 @@ The non-verbose output typically provides:
 - cmd -> taskkill
 
 ```js
-var win = require('win-service');
+var service = require('win-sv');
 
-win.process.kill(pid[,force]) => Promise;
+service.process.kill(pid[,force]) => Promise;
 // or
-win.Process.kill(pid[,force]) => Promise;
+service.Process.kill(pid[,force]) => Promise;
 ```
 
 ---

@@ -5,7 +5,7 @@ const application = new EventLogger({ source: 'source.aplication' });
 const system = new EventLogger({ source: 'source.system', isSystem: true });
 const systemV2 = new EventLogger('source.system', true);
 
-function callback(error) {
+function errorHandler(error) {
     console.error('caught error', error.message)
 }
 
@@ -24,13 +24,13 @@ source message info`;
 }
 
 function writeLog3() {
-    system.info('system message info', 'node').catch(callback)
-    system.warn('system message warn', 'node').catch(callback)
-    system.error('system message error', 'node').catch(callback)
+    system.info('system message info', 'node').catch(errorHandler)
+    system.warn('system message warn', 'node').catch(errorHandler)
+    system.error('system message error', 'node').catch(errorHandler)
 }
 
 function writeLog2() {
-    application.info('application message info', 'node').catch(callback)
-    application.warn('application message warn', 'node').catch(callback)
-    application.error('application message error', 'node').catch(callback)
+    application.info('application message info', 'node').catch(errorHandler)
+    application.warn('application message warn', 'node').catch(errorHandler)
+    application.error('application message error', 'node').catch(errorHandler)
 }

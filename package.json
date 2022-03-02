@@ -1,12 +1,12 @@
 {
-  "name": "win-service",
-  "version": "1.0.0",
+  "name": "win-sv",
+  "version": "0.0.1",
   "description": "Wrapper for WinSW.exe, OS service manager, event logging, UAC, and several helper methods for interacting with Windows services.",
   "author": "Sorin Muresan <sorinm025@gmail.com>",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git://github.com/vision10/node-win-service.git"
+    "url": "git://github.com/vision10/node-win-sv.git"
   },
   "keywords": [
     "windows",
@@ -27,16 +27,17 @@
     "win32"
   ],
   "engines": {
-    "node": ">=6.4"
+    "node": ">=8"
   },
   "bin": {
     "service": "./bin/cli.js"
   },
   "scripts": {
-    "test": "node ./examples/service.js"
+    "test": "node ./examples/service.js",
+    "uninstall": "node ./examples/service.js --uninstall"
   },
   "dependencies": {
     "xml": "^1.0.1",
-    "yargs": "^14.2.0"
+    "yargs": "^17.3.1"
   }
 }

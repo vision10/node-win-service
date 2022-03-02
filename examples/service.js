@@ -1,27 +1,30 @@
 const path = require('path');
 const { Service } = require('../index');
 
+console.log('__dirname', __dirname)
+
 // careful with relative paths (node ./examples/service.js => path will not be right)
-// var srv1 = new Service({ name: 'test1', script: './server.js' });
-// var srv2 = new Service({ name: 'test2', script: path.resolve('./server.js') });
-// var srv3 = new Service({ name: 'test3', script: 'server.js', cwd: __dirname });
-// // for this to work the cmd path needs to be where the server.js file is
+// for this to work the cmd path needs to be where the file is or use cwd
+var srv1 = new Service({ name: '@test1', script: './server.js' });
+var srv2 = new Service({ name: '@test2', script: path.resolve('./server.js') });
+setEvents([srv1, srv2]);
+// srv1.install();
+// srv2.install();
 
-// attachEvents([srv1, srv2, srv3]);
-// srv1.install(function (err) { console.log(srv1.name + ' callback started !', err) });
-// srv2.install(function (err) { console.log(srv2.name + ' callback started !', err) });
-// srv3.install(function (err) { console.log(srv3.name + ' callback started !', err) });
-
-var srv4 = new Service({ name: 'test4', script: __dirname + '\\' + 'server.js' });
+var srv3 = new Service({ id: '@test3', script: 'server.js', cwd: path.join(__dirname, '..') });
+var srv4 = new Service({ id: '@test4', script: path.join(__dirname, 'server.js') });
 var srv5 = new Service({
-    name: 'test5',
+    id: 'test5', // service name
+    name: '@test5', // display name
     script: `${__dirname}\\server.js`,
     cwd: __dirname,
-    winswPath: path.join(__dirname, '..'),
+    winswDest: path.join(__dirname, '..'),
+    description: 'some kind of description',
     scriptOptions: ['--port=9000']
 });
 
-attachEvents([srv4, srv5]);
+setEvents([srv3, srv4, srv5]);
+srv3.install().catch(errorHandler);
 srv4.install().catch(errorHandler);
 srv5.install().catch(errorHandler);
 
@@ -29,7 +32,7 @@ function errorHandler(error) {
     console.error('caught error', error.message)
 }
 
-function attachEvents(srv) {
+function setEvents(srv) {
     srv.forEach(service => {
         service.on('stop', function () { console.log(service.name + ' event callback stop !') });
         service.on('uninstall', function (msg) {
@@ -39,12 +42,13 @@ function attachEvents(srv) {
         service.on('install', async function (msg) {
             console.log(service.name + ' event callback install !')
             if (msg) console.log('msg', msg)
+
+            console.log('start service')
             service.start()
         });
         service.on('start', function () {
             console.log(service.name + ' event callback start !')
-            setTimeout(() => { service.uninstall() }, 5000)
-            // service.uninstall(true);
+            setTimeout(() => { service.uninstall(null, null, null, true); }, 5000);
         });
     })
 }
