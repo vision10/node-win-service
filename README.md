@@ -1,8 +1,9 @@
 [![npm version](https://badge.fury.io/js/win-sv.svg)](https://badge.fury.io/js/win-sv)
 
 Wrapper for [WinSW](https://github.com/kohsuke/winsw), event logging, Windows service manager.
-- Temporarely using 2.11.0 until a more stable version is released
 - current verrsion: WinSW v3.0.0-alpha.10
+- Temporarely using 2.11.0 until a more stable version is released
+
 ## Features
 
 - **OS Service**: Run scripts (not necessarily Node.js) as native Windows services.
