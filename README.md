@@ -2,7 +2,9 @@
 
 Wrapper for [WinSW](https://github.com/kohsuke/winsw), event logging, Windows service manager.
 - current version: WinSW v3.0.0-alpha.10
-- Temporarely using 2.11.0 until a more stable version is released
+- Temporarely using 2.11.0 until a more stable version is released, 
+code adapted for v3, some features might not work, 
+function signatures might change
 
 ## Features
 
@@ -11,21 +13,17 @@ Wrapper for [WinSW](https://github.com/kohsuke/winsw), event logging, Windows se
 - **Process**:
   - _Start, Stop, Restart Services/Tasks_
   - _List Tasks_: List windows running services/tasks.
-  - _Kill Task_: Kill a specific windows service/task (by PID).
+  - _Kill Task_: Kill a specific windows service/task by PID or name.
 
 ## Installation
-
-    npm install -g win-sv
-  
-  or  
 
     npm install win-sv
 
 ## Usage
 
-- All options: [WinSW instalation guide](https://github.com/kohsuke/winsw/blob/master/doc/xmlConfigFile.md)
+- All WinSW options: [WinSW instalation guide](https://github.com/kohsuke/winsw/blob/master/doc/xmlConfigFile.md)
 
-Minimal required options (`name`, `script`): 
+Minimal required options (`id`, `script`): 
 
 ```js
 var { Service } = require('win-sv');
@@ -33,32 +31,36 @@ var { Service } = require('win-sv');
 var svc = new Service({
   id: 'HelloWorld', // service name
   script: 'C:\\path\\to\\helloworld.js',
-  
   // optional
   name: 'my service' // display name
   description: 'Server powered by node.js.',
 });
 ```
-A few more options
+
+All options description:
+
 - `winswDir`: directory name for winsw instance
 - `winswDest`: path where to place the winsw.exe instance, 
   - defaults to `script` path
 
 ```js
-  winswDir: 'service', // default 
+  winswDir: 'service', // default: 'daemon'
   winswDest: 'C:/different/path',
   // result: creates a folder named 'service' in C:/different/path/
-
-  nodeOptions: ['--harmony'],
-  // or
-  execOptions: ['--harmony'],
-
-  scriptOptions: ['--port=9000'],
   
+  // executable that will run the script,
+  execPath: '', // usually not necessary, defaults to node.exe
+  execOptions/nodeOptions: [], // list of node/executable arguments
+  scriptOptions: [], // list of script arguments
+  // current working directory
+  workingdirectory: '', // be careful with relative paths
+
   // simple Object or Array
-  env: [
-    { name: "HOME", value: process.env["USERPROFILE"] }, 
-  ],
+  env: { "HOME": process.env["USERPROFILE"] },
+  // or
+  env: [{ name: "HOME", value: process.env["USERPROFILE"] },],
+
+  depend: [],// service depends on another service to run properly, wait for depend service to start
 
   // Run under a different User Account
   logOnAs: true, // local
@@ -66,7 +68,7 @@ A few more options
   logOnAs: {
     domain: 'mydomain.local',
     account: 'username',
-    password: 'password',
+    password: 'password', // optional, default: ''
     allowservicelogon: true // optional
   },
   // or group managed service
@@ -75,14 +77,45 @@ A few more options
     account: 'username$', // $ - important
     allowservicelogon: true // optional
   },
-  onfailure: [
+
+  resetfailure: 1 // in seconds
+  onfailure: [ // max 3 options
     { action: "restart" delay: 10 }, // delay in seconds
     { action: "reboot" delay: 20 },
     { action: "none" },
-  ] 
+  ],
+  
+  logpath: '',// change default log path, default: in winsw daemon folder
+  log: { // log options
+    mode: 'append' || 'roll-by-time' || 'roll-by-size' || 'roll-by-size-time',
+    // optional/extra properties for each option
+    // roll-by-time: pattern
+    // roll-by-size: sizeThreshold, keepFiles
+    // roll-by-size-time: sizeThreshold, pattern, autoRollAtTime
+  },
+  priority: 'Normal|Idle|High|RealTime|BelowNormal|AboveNormal',
+  startmode: 'Automatic|Manual|Boot|System',
+  delayedAutoStart: false,
+  stoptimeout: '1', // in seconds
+  
+  securitydescriptor: '',
+  startarguments: [],
+  stopexecutable: false,
+  stoparguments: [], // stopexecutable must be true
+  interactive: false,
+
+  beeponshutdown: false,
+  download: {
+    from: '',
+    to: '',
+    failOnError: '',
+    auth: '',
+    username: '',
+    password: '', // optional
+  },
 ```
 
-**Promise**
+**Result is alwaus a Promise**
 
 ```js
 var result = await svc.status() => Promise;
@@ -97,7 +130,7 @@ var result = await svc.customize() => Promise;
 var result = await svc.uninstall(skipFileDelete) => Promise;
 ```
 
-> Note: `uninstall` only removes the OS service and process specific files not the application (file removal can be skipped).
+> Note: `uninstall` only removes the OS service and process specific files not the application itself (also, file removal can be skipped).
 
 
 **Events**
@@ -108,9 +141,12 @@ svc.on('start', function(msg) { console.log(msg) });
 svc.on('stop', function(msg) { console.log(msg) });
 svc.on('restart', function(msg) { console.log(msg) });
 svc.on('install', function(msg) { svc.start() });
+svc.on('refresh', function(msg) { console.log(msg) });
+svc.on('customize', function(msg) { console.log(msg) });
 svc.on('uninstall', function(msg) { console.log(msg) });
 svc.on('invalidinstallation', function(msg) { console.log(msg) });
 ```
+- `selfRestart` calls `restart` event
 
 # Event Logging
 
@@ -191,10 +227,11 @@ The non-verbose output typically provides:
 ```js
 var service = require('win-sv');
 
-service.process.kill(pid[,force]) => Promise;
+service.process.kill(pidOrName[,force]) => Promise;
 // or
-service.Process.kill(pid[,force]) => Promise;
+service.Process.kill(pidOrName[,force]) => Promise;
 ```
+> Note: using name can kill multiple processes
 
 ---
 
