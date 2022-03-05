@@ -45,7 +45,7 @@ function setEvents(srv) {
         service.on('start', function (msg) {
             console.log(name + ' event callback start !')
             if (msg) console.log('msg start', msg)
-            setTimeout(() => { service.uninstall(null, null, null, true); }, 5000);
+            setTimeout(() => { service.uninstall(true); }, 5000);
         });
     })
 }

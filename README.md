@@ -119,18 +119,23 @@ All options description:
 
 ```js
 var result = await svc.status() => Promise;
-var result = await svc.start() => Promise;
-var result = await svc.stop() => Promise;
-var result = await svc.restart() => Promise;
-var result = await svc.selfRestart() => Promise;
-var result = await svc.install() => Promise;
-var result = await svc.refresh() => Promise;
-var result = await svc.customize() => Promise;
+var result = await svc.start([noElevate]) => Promise;
+var result = await svc.stop([force][, noElevate][, noWait]) => Promise;
+var result = await svc.restart([noElevate]) => Promise;
+var result = await svc.selfRestart([noElevate]) => Promise;
+var result = await svc.refresh(options[, noElevate]) => Promise;
+var result = await svc.customize([output][, manufacturer]) => Promise;
 // auto stops if necesssary
-var result = await svc.uninstall(skipFileDelete) => Promise;
+var result = await svc.uninstall([removeFiles][, forceStop][, noElevate][, noWait]) => Promise;
+var result = await svc.install({
+  overwrite: true // overwrite files if already exists
+  noElevate: false,
+  user/username: '',
+  pass/password: '',
+}) => Promise;
 ```
 
-> Note: `uninstall` only removes the OS service and process specific files not the application itself (also, file removal can be skipped).
+> Note: `uninstall` only removes the OS service, `removeFiles` option removes process specific files not the application itself
 
 
 **Events**
