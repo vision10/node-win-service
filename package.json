@@ -1,6 +1,6 @@
 {
   "name": "win-sv",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "Wrapper for WinSW.exe, OS service manager, event logging, UAC, and several helper methods for interacting with Windows services.",
   "author": "Sorin Muresan <sorinm025@gmail.com>",
   "license": "MIT",
