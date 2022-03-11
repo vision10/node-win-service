@@ -1,6 +1,6 @@
 {
   "name": "win-sv",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Wrapper for WinSW.exe, OS service manager, event logging, UAC, and several helper methods for interacting with Windows services.",
   "author": "Sorin Muresan <sorinm025@gmail.com>",
   "license": "MIT",
@@ -33,8 +33,7 @@
     "service": "./bin/cli.js"
   },
   "scripts": {
-    "test": "node ./examples/service.js",
-    "uninstall": "node ./examples/service.js --uninstall"
+    "test": "node ./examples/service.js"
   },
   "dependencies": {
     "xml": "^1.0.1",
